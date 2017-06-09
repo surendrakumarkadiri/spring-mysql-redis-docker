@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +25,13 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 
+	@Autowired
+	private RedisTemplate<String, String> redisTemplate;
+	@Autowired
+	StringRedisTemplate stringRedisTemplate;
+
 	@GetMapping(path = "/users")
+	@Cacheable("user2")
 	public List<User> getAllUsers() {
 		return userService.getAllUers();
 	}
@@ -45,7 +53,8 @@ public class UserController {
 
 	@DeleteMapping(path = "/users/{id}")
 	public String updateUser(@PathVariable Integer id) {
+		redisTemplate.delete("user2");
 		return userService.deleteUser(id);
 	}
-	
+
 }
